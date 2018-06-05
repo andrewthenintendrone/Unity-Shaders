@@ -43,7 +43,7 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// blend colors based on factor
-				return lerp(_Color1, _Color2, sin(_Time));
+				return lerp(_Color1, _Color2, sin(_Time) * 0.5 + 0.5);
 			}
 			ENDCG
 		}

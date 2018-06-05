@@ -5,223 +5,134 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter))]
 public class CreateTerrain : MonoBehaviour
 {
+    // components
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private MeshCollider meshCollider;
 
-    private Mesh myMesh;
-    private List<Vector3> verts = new List<Vector3>();
-    private List<int> tris = new List<int>();
-    private List<Vector2> uvs = new List<Vector2>();
+    // terrain mesh
+    private Mesh mesh;
 
-    // heightmap heights
-    private List<float> heights = new List<float>();
+    // lists for mesh verts, indices, and uvs
+    List<Vector3> verts = new List<Vector3>();
+    List<int> indices = new List<int>();
+    List<Vector2> uvs = new List<Vector2>();
 
-    public Vector2 perlinScale;
-    public Vector2 perlinScrollSpeed;
-    private Vector2 perlinScroll = Vector2.zero;
-    public Vector2 uvScrollSpeed;
-    private Vector2 uvScroll = Vector2.zero;
-    public Vector2Int gridScale;
-    public Vector3 terrainScale;
+    // number of verts in the grid
+    public Vector2Int gridSize = new Vector2Int(64, 64);
+    // scale of the grid in unity units
+    public Vector3 gridScale = new Vector3(64, 64, 64);
+    // scale to sample perlin noise at
+    public Vector2 perlinScale = new Vector2(0.1f, 0.1f);
 
-    [Tooltip("diamond square feature size")]
-    public int featureSize;
+    private float[,] m_heights;
 
     void Start()
     {
-        meshFilter = gameObject.GetComponent<MeshFilter>();
-        meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshCollider = gameObject.GetComponent<MeshCollider>();
+        meshFilter = GetComponent<MeshFilter>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshCollider = GetComponent<MeshCollider>();
 
-        myMesh = new Mesh();
-
-        generateDiamondSquare();
         createMesh();
+
+        meshFilter.sharedMesh = mesh;
+        meshCollider.sharedMesh = mesh;
     }
 
-    // creates the mesh
+    // creates the mesh (only done once)
     void createMesh()
     {
-        //float minY = 0;
-        //float maxY = 0;
-
-        //foreach (float height in heights)
-        //{
-        //    minY = Mathf.Min(minY, height * terrainScale.y);
-        //    maxY = Mathf.Max(maxY, height * terrainScale.y);
-        //}
-
-        //meshRenderer.material.SetFloat("_LowestY", minY);
-        //meshRenderer.material.SetFloat("_HighestY", maxY);
-
-        myMesh.Clear();
-        myMesh.name = "perlin_terrain";
+        // reset mesh
+        mesh = new Mesh();
+        mesh.Clear();
 
         verts.Clear();
-        tris.Clear();
+        indices.Clear();
         uvs.Clear();
 
-        // generate geometry
-        for (int x = 0, i = 0; x < gridScale.x; x++)
+        // gridSize can't go above 256x256
+        gridSize.x = Mathf.Min(gridSize.x, 255);
+        gridSize.y = Mathf.Min(gridSize.y, 255);
+
+        // precalculate center of grid
+        Vector2 gridCenter = new Vector2(gridScale.x * 0.5f, gridScale.z * 0.5f);
+
+        // create mesh data
+        for (int y = 0, i = 0; y < gridSize.y; y++)
         {
-            for (int z = 0; z < gridScale.y; z++, i++)
+            for (int x = 0; x < gridSize.x; x++, i++)
             {
-                float newX = x / (float)gridScale.x * terrainScale.x - terrainScale.x / 2.0f;
-                float newY = heights[i] * terrainScale.y;
-                float newZ = z / (float)gridScale.y * terrainScale.z - terrainScale.z / 2.0f;
+                // create vert
+                float xPosition = (float)x / (float)gridSize.x * gridScale.x - gridCenter.x;
+                float zPosition = (float)y / (float)gridSize.y * gridScale.y - gridCenter.y;
 
-                verts.Add(new Vector3(newX, newY, newZ));
-                uvs.Add(new Vector2(x / (float)gridScale.x, z / (float)gridScale.y));
+                verts.Add(new Vector3(xPosition, 0, zPosition));
 
-                if (x < gridScale.x - 1 && z < gridScale.y - 1)
+                // create uv
+                uvs.Add(new Vector2((float)x / (float)gridSize.x, (float)y / (float)gridSize.y));
+
+                // add index (don't run off the end)
+                if (x < gridSize.x - 1 && y < gridSize.y - 1)
                 {
                     int i2 = i + 1;
-                    int i3 = i + gridScale.x;
-                    int i4 = i + gridScale.x + 1;
+                    int i3 = i + gridSize.x;
+                    int i4 = i2 + gridSize.x;
 
-                    tris.Add(i);
-                    tris.Add(i2);
-                    tris.Add(i3);
+                    indices.Add(i4);
+                    indices.Add(i2);
+                    indices.Add(i);
 
-                    tris.Add(i3);
-                    tris.Add(i2);
-                    tris.Add(i4);
+                    indices.Add(i);
+                    indices.Add(i3);
+                    indices.Add(i4);
                 }
             }
         }
 
-        // set mesh geometry
-        myMesh.SetVertices(verts);
-        myMesh.SetTriangles(tris, 0);
-        myMesh.SetUVs(0, uvs);
+        // apply mesh data
+        mesh.SetVertices(verts);
+        mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+        mesh.SetUVs(0, uvs);
 
-        myMesh.RecalculateBounds();
-        myMesh.RecalculateNormals();
-        myMesh.RecalculateTangents();
-
-        meshFilter.sharedMesh = myMesh;
-        meshCollider.sharedMesh = myMesh;
+        // recalculate normals, etc.
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
     }
 
-    // generate heights using perlin noise
-    void generatePerlin()
+    // set heights using perlin noise
+    public void generatePerlin()
     {
-        heights.Clear();
+        // precalculate center of grid
+        Vector2 gridCenter = new Vector2(gridScale.x * 0.5f, gridScale.z * 0.5f);
 
-        for (int x = 0; x < gridScale.x; x++)
+        // update vertices
+        for (int y = 0, i = 0; y < gridSize.y; y++)
         {
-            for (int y = 0; y < gridScale.y; y++)
+            for (int x = 0; x < gridSize.x; x++, i++)
             {
-                heights.Add(Mathf.PerlinNoise(x * perlinScale.x + perlinScroll.x, y * perlinScale.y + perlinScroll.y));
+                // sample perlin noise
+                float yPosition = Mathf.PerlinNoise(x * perlinScale.x, y * perlinScale.y);
+                yPosition *= gridScale.y;
+
+                float xPosition = (float)x / (float)gridSize.x * gridScale.x - gridCenter.x;
+                float zPosition = (float)y / (float)gridSize.y * gridScale.z - gridCenter.y;
+
+                verts[i] = new Vector3(xPosition, yPosition, zPosition);
             }
         }
 
-        createMesh();
-    }
+        // apply verts and recalculate
+        mesh.SetVertices(verts);
 
-    // generates heights using diamond square
-    void generateDiamondSquare()
-    {
-        heights.Clear();
-
-        // create dummy heights
-        for (int i = 0; i < gridScale.x * gridScale.y; i++)
-        {
-            heights.Add(0);
-        }
-
-        int sampleSize = featureSize;
-        float scale = 1.0f;
-
-        while (sampleSize > 1)
-        {
-            DiamondSquare(sampleSize, scale);
-
-            sampleSize /= 2;
-            scale /= 2.0f;
-        }
-
-        createMesh();
-    }
-
-    public void rebuild()
-    {
-        generateDiamondSquare();
-    }
-
-    // diamond square functions
-    float sample(int x, int y)
-    {
-        return heights[(x & (gridScale.x - 1)) + (y & (gridScale.y - 1)) * gridScale.x];
-    }
-
-    void setSample(int x, int y, float value)
-    {
-        heights[(x & (gridScale.x - 1)) + (y & (gridScale.y - 1)) * gridScale.x] = value;
-    }
-
-    void DiamondSquare(int stepsize, float scale)
-    {
-        int halfstep = stepsize / 2;
-
-        for (int y = halfstep; y < gridScale.y + halfstep; y += stepsize)
-        {
-            for (int x = halfstep; x < gridScale.x + halfstep; x += stepsize)
-            {
-                sampleSquare(x, y, stepsize, Random.Range(-1.0f, 1.0f) * scale);
-            }
-        }
-
-        for (int y = 0; y < gridScale.y; y += stepsize)
-        {
-            for (int x = 0; x < gridScale.x; x += stepsize)
-            {
-                sampleDiamond(x + halfstep, y, stepsize, Random.Range(-1.0f, 1.0f) * scale);
-                sampleDiamond(x, y + halfstep, stepsize, Random.Range(-1.0f, 1.0f) * scale);
-            }
-        }
-    }
-
-    void sampleSquare(int x, int y, int size, float value)
-    {
-        int hs = size / 2;
-
-        // a     b 
-        //
-        //    x
-        //
-        // c     d
-
-        float a = sample(x - hs, y - hs);
-        float b = sample(x + hs, y - hs);
-        float c = sample(x - hs, y + hs);
-        float d = sample(x + hs, y + hs);
-
-        setSample(x, y, ((a + b + c + d) / 4.0f) + value);
-    }
-
-    void sampleDiamond(int x, int y, int size, float value)
-    {
-        int hs = size / 2;
-
-        //   c
-        //
-        //a  x  b
-        //
-        //   d
-
-        float a = sample(x - hs, y);
-        float b = sample(x + hs, y);
-        float c = sample(x, y - hs);
-        float d = sample(x, y + hs);
-
-        setSample(x, y, ((a + b + c + d) / 4.0f) + value);
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
     }
 }
 
@@ -233,11 +144,11 @@ public class CreateTerrainEditor : Editor
     {
         DrawDefaultInspector();
 
-        CreateTerrain instance = (CreateTerrain)target;
+        CreateTerrain myScript = (CreateTerrain)target;
 
-        if(GUILayout.Button("rebuild"))
+        if(GUILayout.Button("generate perlin"))
         {
-            instance.rebuild();
+            myScript.generatePerlin();
         }
     }
 }
