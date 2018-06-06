@@ -113,60 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &245384132
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.000000081460335
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 224343f6a24af1c4a9aeecedd27cb66a, type: 3}
-  m_IsPrefabParent: 0
 --- !u!1 &448469821
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,8 +303,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSize: {x: 64, y: 64}
-  gridScale: {x: 64, y: 64, z: 64}
+  terrainScale: {x: 64, y: 4, z: 64}
   perlinScale: {x: 0.1, y: 0.1}
+  perlinOffset: {x: 0, y: 0}
 --- !u!64 &2121202012
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -387,7 +334,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 4881e2c3eda0d9e42a10019abe830c7b, type: 2}
+  - {fileID: 2100000, guid: 48ba5f8388c0b174f87d9f693f7b2940, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

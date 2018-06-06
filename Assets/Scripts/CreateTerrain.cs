@@ -18,6 +18,8 @@ public class CreateTerrain : MonoBehaviour
     // terrain mesh
     private Mesh mesh;
 
+    private Texture2D perlinTexture;
+
     // lists for mesh verts, indices, and uvs
     List<Vector3> verts = new List<Vector3>();
     List<int> indices = new List<int>();
@@ -25,12 +27,12 @@ public class CreateTerrain : MonoBehaviour
 
     // number of verts in the grid
     public Vector2Int gridSize = new Vector2Int(64, 64);
-    // scale of the grid in unity units
-    public Vector3 gridScale = new Vector3(64, 64, 64);
+    // scale of the terrain in unity units
+    public Vector3 terrainScale = new Vector3(64, 64, 64);
     // scale to sample perlin noise at
     public Vector2 perlinScale = new Vector2(0.1f, 0.1f);
-
-    private float[,] m_heights;
+    // position to sample perlin noise at
+    public Vector2 perlinOffset = new Vector2(0, 0);
 
     void Start()
     {
@@ -42,6 +44,9 @@ public class CreateTerrain : MonoBehaviour
 
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
+
+        // generate once at start
+        //generatePerlin();
     }
 
     // creates the mesh (only done once)
@@ -59,8 +64,8 @@ public class CreateTerrain : MonoBehaviour
         gridSize.x = Mathf.Min(gridSize.x, 255);
         gridSize.y = Mathf.Min(gridSize.y, 255);
 
-        // precalculate center of grid
-        Vector2 gridCenter = new Vector2(gridScale.x * 0.5f, gridScale.z * 0.5f);
+        // precalculate center of terrain
+        Vector2 terrainCenter = new Vector2(terrainScale.x * 0.5f, terrainScale.z * 0.5f);
 
         // create mesh data
         for (int y = 0, i = 0; y < gridSize.y; y++)
@@ -68,8 +73,8 @@ public class CreateTerrain : MonoBehaviour
             for (int x = 0; x < gridSize.x; x++, i++)
             {
                 // create vert
-                float xPosition = (float)x / (float)gridSize.x * gridScale.x - gridCenter.x;
-                float zPosition = (float)y / (float)gridSize.y * gridScale.y - gridCenter.y;
+                float xPosition = (float)x / (float)gridSize.x * terrainScale.x - terrainCenter.x;
+                float zPosition = (float)y / (float)gridSize.y * terrainScale.y - terrainCenter.y;
 
                 verts.Add(new Vector3(xPosition, 0, zPosition));
 
@@ -108,8 +113,8 @@ public class CreateTerrain : MonoBehaviour
     // set heights using perlin noise
     public void generatePerlin()
     {
-        // precalculate center of grid
-        Vector2 gridCenter = new Vector2(gridScale.x * 0.5f, gridScale.z * 0.5f);
+        // precalculate center of terrain
+        Vector2 terrainCenter = new Vector2(terrainScale.x * 0.5f, terrainScale.z * 0.5f);
 
         // update vertices
         for (int y = 0, i = 0; y < gridSize.y; y++)
@@ -117,11 +122,11 @@ public class CreateTerrain : MonoBehaviour
             for (int x = 0; x < gridSize.x; x++, i++)
             {
                 // sample perlin noise
-                float yPosition = Mathf.PerlinNoise(x * perlinScale.x, y * perlinScale.y);
-                yPosition *= gridScale.y;
+                float yPosition = Mathf.PerlinNoise(x * perlinScale.x + perlinOffset.x, y * perlinScale.y + perlinOffset.y);
+                yPosition *= terrainScale.y;
 
-                float xPosition = (float)x / (float)gridSize.x * gridScale.x - gridCenter.x;
-                float zPosition = (float)y / (float)gridSize.y * gridScale.z - gridCenter.y;
+                float xPosition = (float)x / (float)gridSize.x * terrainScale.x - terrainCenter.x;
+                float zPosition = (float)y / (float)gridSize.y * terrainScale.z - terrainCenter.y;
 
                 verts[i] = new Vector3(xPosition, yPosition, zPosition);
             }
@@ -133,6 +138,9 @@ public class CreateTerrain : MonoBehaviour
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
+
+        // tell shader how tall the terrain is for shading
+        meshRenderer.material.SetVector("_TerrainScale", new Vector4(terrainScale.x, terrainScale.y, terrainScale.z, 1.0f));
     }
 }
 
