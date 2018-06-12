@@ -59,7 +59,7 @@
 			sampler2D _SnowTex;
 			float _SampleScale;
 
-			float4 _TerrainScale;
+			float4 _TerrainScale = float4(1, 1, 1, 1);
 			
 			// vertex shader
 			v2f vert (appdata v)

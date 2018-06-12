@@ -25,8 +25,8 @@
 
 			struct v2f
 			{
-				float4 vertex : SV_POSITION;
 				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
 			};
 
 			sampler2D _MainTex;
@@ -43,64 +43,65 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float2 texel = _MainTex_TexelSize.xy;
+				// positions to sample
+				float2 samplePositions[9] =
+				{
+					float2(-1, -1),
+					float2(0, -1),
+					float2(1, -1),
+					float2(-1, 0),
+					float2(0, 0),
+					float2(1, 0),
+					float2(-1, 1),
+					float2(0, 1),
+					float2(1, 1)
+				};
+
+				// horizontal kernel
+				float kernelH[9] =
+				{
+					1,
+					2,
+					1,
+					0,
+					0,
+					0,
+					-1,
+					-2,
+					-1
+				};
+
+				// vertical kernel
+				float kernelV[9] =
+				{
+					1,
+					0,
+					-1,
+					2,
+					0,
+					-2,
+					1,
+					0,
+					-1
+				};
 
 				float3 sobelH = float3(0, 0, 0);
 				float3 sobelV = float3(0, 0, 0);
 
-				float2 samplePositions[9] =
+				for (int k = 0; k < 9; k++)
 				{
-					float2(i.uv.x - texel.x, i.uv.y - texel.y),
-					float2(texel.x, i.uv.y - texel.y),
-					float2(i.uv.x + texel.x, i.uv.y - texel.y),
-					float2(i.uv.x - texel.x, i.uv.y),
-					float2(i.uv.x, i.uv.y),
-					float2(i.uv.x + texel.x, i.uv.y),
-					float2(i.uv.x - texel.x, i.uv.y + texel.y),
-					float2(i.uv.x, i.uv.y + texel.y),
-					float2(i.uv.x + texel.x, i.uv.y + texel.y)
-				};
-
-				float kernelH[9] =
-				{
-					1,
-					0,
-					-1,
-					2,
-					0,
-					-2,
-					1,
-					0,
-					-1
-				};
-
-				float kernelV[9] =
-				{
-					1,
-					2,
-					1,
-					0,
-					0,
-					0,
-					-1,
-					-2,
-					-1
-				};
-
-				for (int i = 0; i < 9; i++)
-				{
-					//float4 color = tex2D(_MainTex, i.uv);
-
-					sobelH += tex2D(_MainTex, i.uv).rgb;
-					sobelV += tex2D(_MainTex, i.uv).rgb;
+					sobelH += tex2D(_MainTex, i.uv + samplePositions[k] * _MainTex_TexelSize).rgb * kernelH[k];
+					sobelV += tex2D(_MainTex, i.uv + samplePositions[k] * _MainTex_TexelSize).rgb * kernelV[k];
 				}
 
-				sobelH /= 9;
-				sobelV /= 9;
+				float sobelAverageH = (sobelH.r + sobelH.g + sobelH.b) / 3;
+				float sobelAverageV = (sobelV.r + sobelV.g + sobelV.b) / 3;
 
+				float sobelFinal = 1 - pow(pow(sobelAverageH, 2) + pow(sobelAverageV, 2), 0.5);
 
-				fixed4 col = fixed4(sobelH, 1);
-				return col;
+				float3 lines = float3(sobelFinal, sobelFinal, sobelFinal);
+
+				return float4(lines * tex2D(_MainTex, i.uv).rgb, 1);
 			}
 			ENDCG
 		}

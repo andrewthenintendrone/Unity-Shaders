@@ -55,6 +55,7 @@ public class CreateTerrain : MonoBehaviour
         // reset mesh
         mesh = new Mesh();
         mesh.Clear();
+        mesh.name = "TerrainMesh";
 
         verts.Clear();
         indices.Clear();
@@ -74,7 +75,7 @@ public class CreateTerrain : MonoBehaviour
             {
                 // create vert
                 float xPosition = (float)x / (float)gridSize.x * terrainScale.x - terrainCenter.x;
-                float zPosition = (float)y / (float)gridSize.y * terrainScale.y - terrainCenter.y;
+                float zPosition = (float)y / (float)gridSize.y * terrainScale.z - terrainCenter.y;
 
                 verts.Add(new Vector3(xPosition, 0, zPosition));
 
