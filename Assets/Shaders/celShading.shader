@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-Shader "Unlit/celShading"
+﻿Shader "Unlit/celShading"
 {
 	Properties
 	{

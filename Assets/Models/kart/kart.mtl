@@ -1,0 +1,16 @@
+# Blender MTL File: 'kart.blend'
+# Material Count: 1
+
+newmtl BodyK_Std__m_Body
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_bump textures\\bodyk_std_nrm.png
+map_Kd textures\\bodyk_std_mro_alb.png
+map_d textures\\bodyk_std_emm.1.png
+map_Ks textures\\body_dummy_spm.png
