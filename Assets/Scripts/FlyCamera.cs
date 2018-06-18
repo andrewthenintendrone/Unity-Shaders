@@ -11,29 +11,43 @@ public class FlyCamera : MonoBehaviour
     float yaw = 0;
     float sensitivity = 2.0f;
 
+    bool canMove = false;
+
     void Update ()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            canMove = !canMove;
+        }
+        if(canMove)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
-        pitch -= Input.GetAxis("Mouse Y") * sensitivity;
-        yaw += Input.GetAxis("Mouse X") * sensitivity;
+            pitch -= Input.GetAxis("Mouse Y") * sensitivity;
+            yaw += Input.GetAxis("Mouse X") * sensitivity;
 
-        pitch = Mathf.Min(pitch, 89.0f);
-        pitch = Mathf.Max(pitch, -89.0f);
+            pitch = Mathf.Min(pitch, 89.0f);
+            pitch = Mathf.Max(pitch, -89.0f);
 
-        transform.eulerAngles = new Vector3(pitch, yaw, 0);
+            transform.eulerAngles = new Vector3(pitch, yaw, 0);
 
-        float velocity = (running() ? runSpeed : walkSpeed) * Time.deltaTime;
+            float velocity = (running() ? runSpeed : walkSpeed) * Time.deltaTime;
 
-        Vector3 movement = Vector3.zero;
+            Vector3 movement = Vector3.zero;
 
-        movement += transform.forward * Input.GetAxisRaw("Vertical");
-        movement += transform.right * Input.GetAxisRaw("Horizontal");
+            movement += transform.forward * Input.GetAxisRaw("Vertical");
+            movement += transform.right * Input.GetAxisRaw("Horizontal");
 
-        movement = movement * velocity;
+            movement = movement * velocity;
 
-        transform.Translate(movement, Space.World);
+            transform.Translate(movement, Space.World);
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     bool running()

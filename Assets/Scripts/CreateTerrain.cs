@@ -46,7 +46,7 @@ public class CreateTerrain : MonoBehaviour
         meshCollider.sharedMesh = mesh;
 
         // generate once at start
-        //generatePerlin();
+        generatePerlin();
     }
 
     // creates the mesh (only done once)

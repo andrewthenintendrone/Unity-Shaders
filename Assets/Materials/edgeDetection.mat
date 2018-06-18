@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: CelShading
-  m_Shader: {fileID: 4800000, guid: f0bf2232c226b6943b4c08e390ff4c54, type: 3}
+  m_Name: edgeDetection
+  m_Shader: {fileID: 4800000, guid: 40bb25e46822bdb44b330dfcb9983d58, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -18,14 +18,19 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _DisplaceTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _OtherTex:
+        m_Texture: {fileID: 2800000, guid: 7fec663b954bcc74181324e47f43adbe, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Ambient: 0.25
-    - _Cuts: 3
+    - _Magnitude: 0.01
     m_Colors:
-    - _AmbientColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DiffuseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TintColor: {r: 0.19442043, g: 0.8820814, b: 0.9117647, a: 1}

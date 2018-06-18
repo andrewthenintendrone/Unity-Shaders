@@ -43,7 +43,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DirtTex:
-        m_Texture: {fileID: 2800000, guid: 0b323e6dd8104f845b6f2eaa319530e6, type: 3}
+        m_Texture: {fileID: 2800000, guid: b09b65f547acaee4caea92af5a9986ce, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -59,7 +59,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GrassTex:
-        m_Texture: {fileID: 2800000, guid: b8a3f6422d4e1554fa1f3ed321932139, type: 3}
+        m_Texture: {fileID: 2800000, guid: fc531a29fe4697a42a812cdd3743c732, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HeightMap:
@@ -91,7 +91,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SandTex:
-        m_Texture: {fileID: 2800000, guid: 32c197d0ba7f4b34595e8baf546335c2, type: 3}
+        m_Texture: {fileID: 2800000, guid: c87e783299df0bc4e9099fd38b83117e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SnowDiff:
@@ -103,7 +103,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SnowTex:
-        m_Texture: {fileID: 2800000, guid: f3105419da093bf4a8760217300c2ac5, type: 3}
+        m_Texture: {fileID: 2800000, guid: 63c50e0199ef7f74da78c1a412d55d88, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture1:
@@ -141,6 +141,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _SampleScale: 1
     - _SmoothnessTextureChannel: 0
     - _SnowCutoff: 4.93
     - _SnowFade: 1

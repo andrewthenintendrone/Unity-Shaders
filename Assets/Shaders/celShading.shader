@@ -22,7 +22,7 @@
 
 			struct v2f
 			{
-				float4 vertex : SV_POSITION;
+				float4 vertex : POSITION;
 				float3 normal : NORMAL;
 				float2 uv : TEXCOORD0;
 			};
@@ -57,7 +57,7 @@
 				float3 N = normalize(i.normal).xyz;
 
 				// get light direction
-				float3 L = normalize(_WorldSpaceLightPos0).xyz;
+				float3 L = normalize(i.vertex.xyz - _WorldSpaceLightPos0.xyz);
 
 				// calculate lambert term (N dot L)
 				float lambertTerm = dot(N, L);
